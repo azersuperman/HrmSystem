@@ -1,0 +1,159 @@
+<template>
+  <div class="app-container">
+    <el-card>
+      <el-tabs v-model="activeName">
+        <el-tab-pane label="角色管理" name='frist'>
+          <el-row :gutter="10">
+            <el-button
+              icon="el-icon-plus"
+              size="small"
+              type="primary"
+              style="margin-left: 10px"
+              @click="dialogVisible=true"
+            >新增角色</el-button>
+          </el-row>
+          <el-table v-loading='loading' border="" :data='roleList'>
+            <el-table-column label="序号" width="120" type='index' />
+            <el-table-column label="角色名称" width="240" prop="name" />
+            <el-table-column label="描述" prop="description" />
+            <el-table-column label="操作" width="240">
+              <template slot-scope="{row}">
+                <el-button size="small" type="success">分配权限</el-button>
+                <el-button size="small" type="primary" @click="editRole(row)">编辑</el-button>
+                <el-button size="small" type="danger" @click="delRow(row.id)">删除</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+          <el-row :gutter="10" type="flex" justify="end" align="middle" style="height:60px">
+            <el-pagination
+              v-if='total>0'
+              background
+              :total="total"
+              layout="prev, pager, next, sizes"
+              :current-page.sync='page.page'
+              :page-size.sync='page.pagesize'
+              :page-sizes=[2,5,10,15]
+              @current-change='getRoleList'
+              @size-change='getRoleList'
+            />
+
+          </el-row>
+        </el-tab-pane>
+        <el-tab-pane label="公司信息" name='second'>
+          <el-alert
+            title="对公司名称、公司地址、营业执照、公司地区的更新，将使得公司资料被重新审核，请谨慎修改"
+            type="info"
+            show-icon
+            :closable="false"
+          />
+          <el-form :model="companyInfo" label-width="120px" style="margin-top:50px">
+            <el-form-item label="公司名称">
+              <el-input v-model="companyInfo.name" disabled style="width:400px" />
+            </el-form-item>
+            <el-form-item label="公司地址">
+              <el-input v-model="companyInfo.companyAddress" disabled style="width:400px" />
+            </el-form-item>
+            <el-form-item label="邮箱">
+              <el-input v-model="companyInfo.mailbox" disabled style="width:400px" />
+            </el-form-item>
+            <el-form-item label="备注">
+              <el-input v-model="companyInfo.remarks" type="textarea" :rows="3" disabled style="width:400px" />
+            </el-form-item>
+          </el-form>
+        </el-tab-pane>
+      </el-tabs>
+    </el-card>
+    <addRole ref="addRole" :dialog-visible.sync='dialogVisible' @reshList='getRoleList' />
+  </div>
+</template>
+
+<script>
+import addRole from './components/addRole.vue'
+import { getRoleList, deleteRole, getCompanyInfo } from '@/api/setting'
+import { mapGetters } from 'vuex'
+export default {
+  name: 'HrsaasIndex',
+  components: {
+    addRole
+  },
+  data() {
+    return {
+      activeName: 'frist',
+      page: {
+        page: 1,
+        pagesize: 10
+      },
+      total: 0,
+      roleList: [],
+      loading: false,
+      dialogVisible: false,
+      companyInfo: {}
+    }
+  },
+  computed: {
+    ...mapGetters(['companyId'])
+  },
+  mounted() {
+    this.getRoleList()
+    this.getcompanyInfo()
+  },
+  methods: {
+    async getRoleList() {
+      try {
+        this.loading = true
+        const { total, rows } = await getRoleList(this.page)
+        this.total = total
+        this.roleList = rows
+        if (total > 0 && this.roleList.length === 0) {
+          this.page.page = this.page.page - 1
+          this.getRoleList()
+        }
+      } finally {
+        this.loading = false
+      }
+    },
+    addRole() {
+      this.dialogVisible = true
+    },
+    // 绑定点击事件
+    // 拿到当前行这条数据
+    // 回显在新增角色的组件上
+    editRole(row) {
+      // row直接赋值给addRole
+      this.$refs.addRole.formDate = { ...row }
+      this.dialogVisible = true
+    },
+    async delRow(id) {
+      try {
+        await this.$confirm('确认删除该角色吗？', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        })
+        await deleteRole(id)
+        this.getRoleList()
+        this.$message({
+          message: '删除成功',
+          type: 'success'
+        })
+        console.log('success')
+      } catch (e) {
+        console.log('cancel')
+      }
+    },
+    async getcompanyInfo() {
+      try {
+        const res = await getCompanyInfo(this.companyId)
+        this.companyInfo = res
+      } catch (e) {
+        console.log(e)
+      }
+    }
+  }
+
+}
+</script>
+
+<style>
+
+</style>
