@@ -15,5 +15,11 @@ export default {
       title: '员工管理',
       icon: 'people'
     }
-  }]
+  },
+  {
+    path: '/employees/Detail/:id',
+    component: () => import('@/views/employees/Detail'),
+    hidden: true
+  }
+  ]
 }

@@ -24,6 +24,7 @@
 </template>
 
 <script>
+import { delDepartments } from '@/api/departments'
 export default {
   name: 'TreeTools',
   props: {
@@ -39,11 +40,29 @@ export default {
   methods: {
     handleCommand(type) {
       if (type === 'add') {
+        console.log(this.treeNode)
         this.$emit('addDept', this.treeNode)
       } else if (type === 'edit') {
-        //
+        this.$emit('editDept', this.treeNode)
       } else {
-        //
+        this.$confirm('是否确认删除该部门', '提示', {
+          type: 'warning'
+        }).then(async res => {
+          console.log(res)
+          return await delDepartments(this.treeNode.id)
+        }).then(res => {
+          this.$message.success('删除成功')
+          this.$emit('refeshlist')
+        })
+        // try {
+        //   this.$confirm('是否确认删除该部门', '提示', {
+        //     type: 'warning'
+        //   })
+        //  await delDepartments(this.treeNode.id)
+        //   this.$message.success('删除成功')
+        // } catch (e) {
+        //   console.log(e)
+        // }
       }
     }
   }

@@ -1,19 +1,31 @@
 <template>
   <div class="dashboard-container">
-    <div class="dashboard-text">name: {{ name }}</div>
-    <svg-icon iconClass='dashboard'></svg-icon>
+    <!-- <UploadExcel :before-upload="beforeUpload" :on-success="handleSuccess" /> -->
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
-
 export default {
   name: 'Dashboard',
+  components: {
+  },
   computed: {
     ...mapGetters([
       'name'
     ])
+  },
+  methods: {
+    handleSuccess(data) {
+      console.log('data', data)
+    },
+    beforeUpload(file) {
+      console.log(file)
+      if (file.size > 102400) {
+        this.$message.error('to Big')
+      }
+      return true
+    }
   }
   // async created() {
   //   const res = await this.$store.dispatch('user/getUserInfo')

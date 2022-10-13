@@ -5,6 +5,7 @@ import router from '@/router'
 // 引入elementUI
 import { Message } from 'element-ui'
 // 通过axios创建axios
+// console.log(process.env.VUE_APP_BASE_API)
 const service = axios.create({
   baseURL: process.env.VUE_APP_BASE_API, // 基准地址 /prod-api
   timeout: 5000
