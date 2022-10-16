@@ -86,16 +86,7 @@
     >
       <canvas ref="canvas"></canvas>
     </el-dialog>
-    <el-dialog
-      title="提示"
-      :visible.sync="dialogVisibleRole"
-      width="50%"
-    >
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
-      </span>
-    </el-dialog>
+    <assign-role :dialogVisible.sync="dialogVisibleRole" />
   </div>
 </template>
 
@@ -104,11 +95,13 @@ import QRCode from 'qrcode'
 import Eumpot from '@/api/constant/employees'
 import { getEmployeeList, delEmployee } from '@/api/employ'
 import addEmployee from '@/views/employees/components/add-employee.vue'
+import assignRole from '@/views/employees/components/assign-role.vue'
 // import PageTools from '@/components/PageTools'
 export default {
   components: {
     // PageTools
-    addEmployee
+    addEmployee,
+    assignRole
   },
   data() {
     return {
