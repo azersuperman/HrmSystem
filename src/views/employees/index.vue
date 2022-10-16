@@ -57,7 +57,7 @@
             <el-button type="text" size="small">转正</el-button>
             <el-button type="text" size="small">调岗</el-button>
             <el-button type="text" size="small">离职</el-button>
-            <el-button type="text" size="small">角色</el-button>
+            <el-button type="text" size="small" @click="openRole">角色</el-button>
             <el-button
               type="text"
               size="small"
@@ -86,6 +86,16 @@
     >
       <canvas ref="canvas"></canvas>
     </el-dialog>
+    <el-dialog
+      title="提示"
+      :visible.sync="dialogVisibleRole"
+      width="50%"
+    >
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -111,7 +121,8 @@ export default {
       loading: false,
       Eumpot: Eumpot.hireType,
       dialogVisible: false,
-      dialogVisibleQrcode: false
+      dialogVisibleQrcode: false,
+      dialogVisibleRole: false
     }
   },
   created() {
@@ -208,6 +219,9 @@ export default {
           console.log('success!')
         })
       })
+    },
+    openRole() {
+      this.dialogVisibleRole = true
     }
   }
 }
