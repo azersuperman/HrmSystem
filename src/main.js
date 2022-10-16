@@ -14,6 +14,8 @@ import router from './router'
 
 import '@/icons' // icon
 import '@/permission' // permission control
+import Print from 'vue-print-nb'
+Vue.use(Print)
 
 import components from '@/components/index1'
 Vue.use(components)

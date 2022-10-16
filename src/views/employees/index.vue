@@ -27,6 +27,11 @@
     <el-card>
       <el-table border :data="list" :loading="loading">
         <el-table-column label="序号" sortable="" width="80" type="index" />
+        <el-table-column label="头像" sortable="" width="80" type="index">
+          <template slot-scope="{row}">
+            <img :src="row.staffPhoto" alt="" width="50px" height="50px" @click="repPic(row.staffPhoto)">
+          </template>
+        </el-table-column>
         <el-table-column label="姓名" prop="username" />
         <el-table-column label="工号" prop="workNumber" />
         <el-table-column
@@ -74,10 +79,18 @@
         />
       </el-row>
     </el-card>
+    <el-dialog
+      title="图像预览"
+      :visible.sync="dialogVisibleQrcode"
+      width="50%"
+    >
+      <canvas ref="canvas"></canvas>
+    </el-dialog>
   </div>
 </template>
 
 <script>
+import QRCode from 'qrcode'
 import Eumpot from '@/api/constant/employees'
 import { getEmployeeList, delEmployee } from '@/api/employ'
 import addEmployee from '@/views/employees/components/add-employee.vue'
@@ -97,7 +110,8 @@ export default {
       total: 0,
       loading: false,
       Eumpot: Eumpot.hireType,
-      dialogVisible: false
+      dialogVisible: false,
+      dialogVisibleQrcode: false
     }
   },
   created() {
@@ -180,6 +194,20 @@ export default {
     },
     employDetail(row) {
       this.$router.push('/employees/Detail/' + row.id)
+    },
+    repPic(staffPhoto) {
+      this.dialogVisibleQrcode = true
+      console.log(staffPhoto)
+      if (!staffPhoto) {
+        this.$message.error('暂时没有头像')
+      }
+      // 异步需要使用nextTick，吧代码放到视图更新后运行
+      this.$nextTick(() => {
+        QRCode.toCanvas(this.$refs.canvas, staffPhoto, function(error) {
+          if (error) console.error(error)
+          console.log('success!')
+        })
+      })
     }
   }
 }

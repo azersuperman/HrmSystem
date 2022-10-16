@@ -1,5 +1,6 @@
 <template>
   <div class="user-info">
+    <i class="el-icon-printer" @click="$router.push('/employees/print/'+userId+'?type=personal')" />
     <!-- 个人信息 -->
     <el-form label-width="220px">
       <!-- 工号 入职时间 -->
@@ -58,6 +59,7 @@
         <el-col :span="12">
           <el-form-item label="员工头像">
             <!-- 放置上传图片 -->
+            <UploadImg ref='uploadAvater' :emloyeesAvater="emloyeesAvater" @on-success="uploadDeliverAvater"></UploadImg>
           </el-form-item>
         </el-col>
       </el-row>
@@ -91,6 +93,7 @@
 
         <el-form-item label="员工照片">
           <!-- 放置上传图片 -->
+          <UploadImg :emloyeesAvater="deliverAvater" @on-success="uploadPic"></UploadImg>
         </el-form-item>
         <el-form-item label="国家/地区">
           <el-select v-model="formData.nationalArea" class="inputW2">
@@ -376,7 +379,7 @@
         <!-- 保存员工信息 -->
         <el-row class="inline-info" type="flex" justify="center">
           <el-col :span="12">
-            <el-button type="primary" @click="saveEmloyeesInfo">保存更新</el-button>
+            <el-button ref="emloyeesPic" type="primary" @click="saveEmloyeesInfo">保存更新</el-button>
             <el-button @click="$router.back()">返回</el-button>
           </el-col>
         </el-row>
@@ -457,7 +460,9 @@ export default {
         isThereAnyCompetitionRestriction: '', // 有无竞业限制
         proofOfDepartureOfFormerCompany: '', // 前公司离职证明
         remarks: '' // 备注
-      }
+      },
+      emloyeesAvater: '',
+      deliverAvater: ''
     }
   },
   created() {
@@ -467,16 +472,23 @@ export default {
   methods: {
     async getUserdetailsAPI() {
       const res = await getUserdetailsAPI(this.userId)
-      console.log(res)
+      if (res.staffPhoto) {
+        this.emloyeesAvater = res.staffPhoto
+      }
       this.userInfo = res
     },
     async getbasicInformation() {
       const res = await getbasicInformation(this.userId)
-      console.log(res)
+      if (res.staffPhoto) {
+        this.deliverAvater = res.staffPhoto
+      }
       this.formData = res
     },
     async saveEmloyeesInfo() {
       try {
+        if (this.$refs.emloyeesPic.loading) {
+          this.$message.success('图片上传成功')
+        }
         await saveEmloyeesInfo(this.formData)
         this.$message.success('保存成功')
       } catch (error) {
@@ -485,11 +497,20 @@ export default {
     },
     async saveBasicInfo() {
       try {
+        if (this.$refs.uploadAvater.loading) {
+          this.$message.error('图片正在上传')
+        }
         await saveUserdetailsAPI(this.userInfo)
-        this.$message.success('保存成功')
+        this.$message.success('保存信息成功')
       } catch (error) {
         this.$message.error('保存失败')
       }
+    },
+    uploadDeliverAvater(data) {
+      this.userInfo.staffPhoto = data.imgURL
+    },
+    uploadPic(data) {
+      this.formData.staffPhoto = data.imgURL
     }
   }
 }
